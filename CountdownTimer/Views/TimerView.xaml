@@ -73,5 +73,12 @@
                 Command="{Binding About}"
                 Content="?"
                 Style="{StaticResource LinkButton}" />
+        
+        <Button Grid.Row="4"
+                Grid.ColumnSpan="2"
+                HorizontalAlignment="Left"
+                Command="{Binding PopUp}"
+                Content="↱"
+                Style="{StaticResource LinkButton}" />
     </Grid>
 </UserControl>

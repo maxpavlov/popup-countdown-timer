@@ -29,6 +29,7 @@ namespace Btl.ViewModels
     {
         private static MainViewModel _main;
         private static TimerViewModel _timer;
+        private static PopUpViewModel _popup;
         private static SettingsViewModel _settings;
         private static AboutViewModel _about;
 
@@ -88,6 +89,19 @@ namespace Btl.ViewModels
                 }
 
                 return _timer;
+            }
+        }
+
+        public PopUpViewModel PopUp
+        {
+            get
+            {
+                if (_popup == null)
+                {
+                    _popup = new PopUpViewModel();
+                }
+
+                return _popup;
             }
         }
 

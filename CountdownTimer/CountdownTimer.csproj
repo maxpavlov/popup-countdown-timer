@@ -38,7 +38,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Resources\CountdownTimer.ico</ApplicationIcon>
+    <ApplicationIcon>CountdownTimer.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="GalaSoft.MvvmLight.Extras.WPF4">
@@ -82,12 +82,16 @@
     <Compile Include="Services\TimerModelBuilder.cs" />
     <Compile Include="Models\TimerState.cs" />
     <Compile Include="ViewModels\AboutViewModel.cs" />
+    <Compile Include="ViewModels\PopUpViewModel.cs" />
     <Compile Include="ViewModels\SettingsViewModel.cs" />
     <Compile Include="ViewModels\TimerViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\ViewModelLocator.cs" />
     <Compile Include="Views\AboutView.xaml.cs">
       <DependentUpon>AboutView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\PopUp.xaml.cs">
+      <DependentUpon>PopUp.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\SettingsView.xaml.cs">
       <DependentUpon>SettingsView.xaml</DependentUpon>
@@ -124,6 +128,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\AboutView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\PopUp.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -177,6 +185,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\CountdownTimer.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="CountdownTimer.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

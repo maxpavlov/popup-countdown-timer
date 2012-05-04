@@ -19,6 +19,7 @@ using System.Windows.Input;
 using System.Windows.Shell;
 using Btl.Builders;
 using Btl.Models;
+using Btl.Views;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
@@ -54,6 +55,7 @@ namespace Btl.ViewModels
         private double _ProgressValue;
         private TaskbarItemProgressState _ProgressState;
         private bool _TopMost;
+        private bool _Visisble;
         #endregion
 
         #region View Models presented in the Content Control
@@ -87,6 +89,8 @@ namespace Btl.ViewModels
         {
             //  Set the start-up view model.
             CurrentViewModel = _locator.Timer;
+
+            Visible = true;
 
             //  Create the commands
             TimerViewCommand = new RelayCommand(() => ExecuteViewTimerCommand());
@@ -156,6 +160,11 @@ namespace Btl.ViewModels
                 case SimpleMessage.MessageType.TimerReset:
                     //  restore window title if we reset.
                     WindowTitle = _originalWindowTitle;
+                    break;
+                case  SimpleMessage.MessageType.SwitchToPopUpView:
+                    Visible = false;
+                    var popUp = new PopUp();
+                    popUp.Show();
                     break;
             }
         }
@@ -243,6 +252,17 @@ namespace Btl.ViewModels
                     return;
                 _currentViewModel = value;
                 RaisePropertyChanged("CurrentViewModel");
+            }
+        }
+
+        public bool Visible
+        {
+            get { return _Visisble; }
+            set 
+            { 
+                if (_Visisble == value) return;
+                _Visisble = value;
+                RaisePropertyChanged("Visible");
             }
         }
 

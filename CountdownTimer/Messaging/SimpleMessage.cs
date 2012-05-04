@@ -48,7 +48,8 @@ namespace Btl.Messaging
             TimerStop,
             TimerStart,
             TimerTick,
-            TimerReset
+            TimerReset,
+            SwitchToPopUpView
         }
 
         public MessageType Type { get; set; }

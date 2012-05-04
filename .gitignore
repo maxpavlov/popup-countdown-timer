@@ -1,1 +1,7 @@
 Express*/
+_ReSharper*
+Btl/Controls/bin/*
+Btl/Controls/obj/*
+*.suo
+CountdownTimer/bin/*
+CountdownTimer/obj/*

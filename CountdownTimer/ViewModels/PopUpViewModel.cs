@@ -1,21 +1,4 @@
-﻿// Copyright 2012 lapthorn.net.
-//
-// This software is provided "as is" without a warranty of any kind. All
-// express or implied conditions, representations and warranties, including
-// any implied warranty of merchantability, fitness for a particular purpose
-// or non-infringement, are hereby excluded. lapthorn.net and its licensors
-// shall not be liable for any damages suffered by licensee as a result of
-// using the software. In no event will lapthorn.net be liable for any
-// lost revenue, profit or data, or for direct, indirect, special,
-// consequential, incidental or punitive damages, however caused and regardless
-// of the theory of liability, arising out of the use of or inability to use
-// software, even if lapthorn.net has been advised of the possibility of
-// such damages.
-//
-// You are free to fork this via github:  https://github.com/barrylapthorn/countdown_timer
-
-
-using System;
+﻿using System;
 using System.Media;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -27,26 +10,34 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 
-
 namespace Btl.ViewModels
 {
-    public class TimerViewModel : ViewModelBase
+    public class PopUpViewModel : ViewModelBase
     {
         #region Members
-        private int _completedCount = 0;
         private FontFamily _fontFamily = null;
         private double _fontSize = 0d;
         private Color _statusColor = Colors.Transparent;
         readonly ITimerModel _timer = TimerModelBuilder.GetNewTimer();
         readonly ISettingsModel _settings = SettingsModelBuilder.GetNewSettings();
+
+        private TaskbarItemProgressState _ProgressState;
+        private double _ProgressValue;
         #endregion
 
         #region Constructors
+        /// <summary>
+        /// Use a static constructor as it is the easiest way to handle any
+        /// exceptions that might be thrown when creating the view models.
+        /// </summary>
+        static PopUpViewModel()
+        {
 
+        }
         /// <summary>
         /// Construct a new timer view model.
         /// </summary>
-        public TimerViewModel()
+        public PopUpViewModel()
         {
             //  add event handlers
             AddEventHandlers();
@@ -60,52 +51,16 @@ namespace Btl.ViewModels
             //  Register against the Messenger singleton to receive any simple
             //  messages.  Specifically the one that says settings have changed.
             Messenger.Default.Register<SimpleMessage>(this, ConsumeMessage);
-
+            Messenger.Default.Register<TaskbarItemMessage>(this, ConsumeTaskbarItemMessage);
         }
+
         #endregion
 
         #region Commands
 
-        public ICommand PopUp { get; private set; }
-        public ICommand About { get; private set; }
-        public ICommand Settings { get; private set; }
         public ICommand StartTimer { get; private set; }
         public ICommand StopTimer { get; private set; }
-        public ICommand ResetTimer { get; private set; }
-
-        #region PopUp Command
-
-        private void PopUpExecute()
-        {
-            Messenger.Default.Send(new SimpleMessage {Type = SimpleMessage.MessageType.SwitchToPopUpView});
-        }
-
-        #endregion
-
-        #region AboutCommand
-
-        /// <summary>
-        /// Executed when we want to switch to the about view
-        /// </summary>
-        private static void AboutExecute()
-        {
-            Messenger.Default.Send(new SimpleMessage { Type = SimpleMessage.MessageType.SwitchToAboutView });
-        }
-
-        #endregion
-
-        #region Settings Command
-
-        /// <summary>
-        /// Executed when we want to switch to the settings view.
-        /// </summary>
-        private void SettingsExecute()
-        {
-            StopTimerExecute();
-            Messenger.Default.Send(new SimpleMessage { Type = SimpleMessage.MessageType.SwitchToSettingsView });
-        }
-        
-        #endregion
+        public ICommand Loaded { get; private set; }
 
         #region Start Command
 
@@ -149,15 +104,13 @@ namespace Btl.ViewModels
 
         #endregion
 
-        #region Reset Command
-
+        #region Loaded Command
         /// <summary>
-        /// Reset the timer and update corresponding values.
+        /// Stuff that is to execute when the view that displays the current ViewModel is loaded
         /// </summary>
-        void ResetTimerExecute()
+        void LoadedExecute()
         {
-            _timer.Reset();
-            UpdateTimerValues();
+            if(CanStartTimerExecute()) StartTimerExecute();
         }
 
         #endregion
@@ -247,24 +200,6 @@ namespace Btl.ViewModels
         }
 
         /// <summary>
-        /// The number of times the countdown has completed successfully.
-        /// </summary>
-        public int CompletedCount
-        {
-            get
-            {
-                return _completedCount;
-            }
-            private set
-            {
-                if (_completedCount == value)
-                    return;
-                _completedCount = value;
-                RaisePropertyChanged("CompletedCount");
-            }
-        }
-
-        /// <summary>
         /// The brush that we paint the clock with.
         /// </summary>
         Brush statusBrush = new SolidColorBrush();
@@ -320,18 +255,72 @@ namespace Btl.ViewModels
                 RaisePropertyChanged("FonSize");
             }
         }
+
+        /// <summary>
+        /// The progress state of the timer (aimed at the taskbar).
+        /// </summary>
+        public TaskbarItemProgressState ProgressState
+        {
+            get
+            {
+                return _ProgressState;
+            }
+            set
+            {
+                if (_ProgressState == value)
+                    return;
+                _ProgressState = value;
+
+                RaisePropertyChanged("ProgressState");
+            }
+        }
+
+        /// <summary>
+        /// The progress value of the timer.
+        /// </summary>
+        public double ProgressValue
+        {
+            get
+            {
+                return _ProgressValue;
+            }
+            set
+            {
+                if (_ProgressValue == value)
+                    return;
+                _ProgressValue = value;
+
+                RaisePropertyChanged("ProgressValue");
+            }
+        }
+
         #endregion
 
         #region Methods
 
+        /// <summary>
+        /// Update the TaskbarItemInfo values with whatever is specified in the
+        /// message.
+        /// </summary>
+        /// <param name="message"></param>
+        void ConsumeTaskbarItemMessage(TaskbarItemMessage message)
+        {
+            if (message == null)
+                return;
+
+            ProgressState = message.State;
+
+            //  if the taskbar item message carried a (percentage) value,
+            //  update the taskbar progress value with it.
+            if (message.HasValue)
+                ProgressValue = message.Value;
+        }
+
         private void BindCommands()
         {
-            Settings = new RelayCommand(() => SettingsExecute());
-            About = new RelayCommand(() => AboutExecute());
             StartTimer = new RelayCommand(() => StartTimerExecute(), CanStartTimerExecute);
             StopTimer = new RelayCommand(() => StopTimerExecute(), CanStopTimerExecute);
-            ResetTimer = new RelayCommand(() => ResetTimerExecute());
-            PopUp = new RelayCommand(() => PopUpExecute());
+            Loaded = new RelayCommand(() => LoadedExecute());
         }
 
         /// <summary>
@@ -458,8 +447,6 @@ namespace Btl.ViewModels
         {
             UpdateTimer(e);
 
-            CompletedCount++;
-
             if (_settings.PlayExclamation)
             {
                 SystemSounds.Exclamation.Play();
@@ -525,6 +512,5 @@ namespace Btl.ViewModels
             Messenger.Default.Send(new SimpleMessage(SimpleMessage.MessageType.TimerReset));
         }
         #endregion
-
     }
 }

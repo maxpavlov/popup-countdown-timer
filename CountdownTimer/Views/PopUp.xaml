@@ -1,0 +1,45 @@
+﻿<Window x:Class="Btl.Views.PopUp"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                DataContext="{Binding PopUp,
+                              Source={StaticResource Locator}}"
+        SizeToContent="WidthAndHeight"
+        WindowStartupLocation="CenterScreen"
+        Topmost="True" 
+        AllowsTransparency="True" 
+        Background="Transparent" 
+        WindowStyle="None" ResizeMode="NoResize">
+
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding Loaded}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    
+    <Window.TaskbarItemInfo>
+        <TaskbarItemInfo ProgressState="{Binding ProgressState}" ProgressValue="{Binding ProgressValue}">
+            <TaskbarItemInfo.ThumbButtonInfos>
+                <ThumbButtonInfoCollection>
+                    <ThumbButtonInfo Command="{Binding StartTimer}"
+                                     Description="Start"
+                                     DismissWhenClicked="False"
+                                     ImageSource="..\Resources\icon.play.png" />
+                    <ThumbButtonInfo Command="{Binding StopTimer}"
+                                     Description="Pause"
+                                     DismissWhenClicked="False"
+                                     ImageSource="..\Resources\icon.pause.png" />
+                </ThumbButtonInfoCollection>
+            </TaskbarItemInfo.ThumbButtonInfos>
+        </TaskbarItemInfo>
+    </Window.TaskbarItemInfo>
+
+    <StackPanel>
+        <Label Name="TimerLabel"
+               Background="#AAFFFFFF"
+               Content="{Binding TimerValue}"
+               FontFamily="{Binding FontFamily}"
+               FontSize="{Binding FontSize}"
+               Foreground="Red" />
+    </StackPanel>
+</Window>

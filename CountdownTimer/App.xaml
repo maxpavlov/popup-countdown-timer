@@ -17,6 +17,8 @@
                 <ResourceDictionary Source="Resources/icon.rewind.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
+            <BooleanToVisibilityConverter x:Key="BoolToViz" />
+
             <!--  This locates our view models for us  -->
             <vm:ViewModelLocator x:Key="Locator" d:IsDataSource="True" />
 
